@@ -1532,7 +1532,7 @@ padding-right: 4px;
   color: #FFFFFF;
   font-size: 1.8rem;
   cursor: pointer;
-  margin-right: 16px;
+  /* margin-right: 16px; */
 }
 
 .mui-style-bpw69w-flex-items_center {
@@ -2829,14 +2829,6 @@ ul.footer-cat-links.active {
   color: #FFFFFF;
   margin-bottom: 16px;
 }
-
-.mui-style-1s38i07-socials-mr_2x {
-  color: #FFFFFF;
-  font-size: 1.8rem;
-  cursor: pointer;
-  margin-right: 16px;
-}
-
 .mui-style-bpw69w-flex-items_center {
   display: -webkit-box;
   display: -webkit-flex;
