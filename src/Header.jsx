@@ -1,7 +1,7 @@
 function Header() {
   const navItems = [
-    { label: 'For You', href: '/', icon: '../public/home-av.svg' },
-    { label: 'Sports', href: '/live/StarSports.html', icon: '../public/cric_of.svg' },
+    { label: 'For You', href: '/', icon: '/home-av.svg' },
+    { label: 'Sports', href: '/live/StarSports.html', icon: '/cric_of.svg' },
     { label: 'Free', href: '/TV', icon: 'https://v3img.voot.com/v3Storage/menu/jv/ic_free_nn.svg' },
     { label: 'Fancode', href: '/tv-shows', icon: 'https://v3img.voot.com/v3Storage/menu/jv/ic_premium_inactive_20nn.svg' },
     { label: 'More', href: '/tv-shows', icon: 'https://v3img.voot.com/v3Storage/menu/jv/more.svg' },
@@ -14,7 +14,7 @@ function Header() {
         <div className="mui-style-1xnl3zj-webroot">
           <div className="mui-style-138c29f-headerMain">
             <div className="mui-style-3ir3rb-headerItems">
-              <img src="../public/logo.jpg" alt="ivy" style={{ height: '57px', cursor: 'pointer' }} />
+              <img src="/logo.jpg" alt="ivy" style={{ height: '57px', cursor: 'pointer' }} />
               <div className="webNavItems">
                 <a className="aWebText" href="/">For You</a>
               </div>
