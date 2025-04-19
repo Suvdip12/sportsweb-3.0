@@ -94,7 +94,7 @@ const Carousel = () => {
                                   <div className="MuiStack-root mui-style-18zsr3k">
                                     <a
                                       className="mui-style-o66pnj"
-                                      href={item.url || `/live/M${index + 1}.html`}
+                                      href={item.url || `https://yaarisports.pages.dev/live/live?id=will`}
                                       id={`shortTitle${index + 1}`}
                                     >
                                       {item.shortTitle || 'Untitled'}
@@ -106,7 +106,7 @@ const Carousel = () => {
                                   <div className="mui-style-pmv5z6-root">
                                     <a
                                       id={`buttonAnchor${index + 1}`}
-                                      href={item.url || `/live/M${index + 1}.html`}
+                                      href={item.url || `https://yaarisports.pages.dev/live/live?id=will`}
                                     >
                                       <button
                                         className="mui-style-haa95m-watchNowBtn"
@@ -140,7 +140,7 @@ const Carousel = () => {
                                   <div className="mui-style-19gfk8p-gradient"></div>
                                 </div>
                                 <div className="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-1 MuiGrid-grid-md-1.5 MuiGrid-grid-lg-1.2 mui-style-13eysxj">
-                                  <a href={item.url || `/live/M${index + 1}.html`}>
+                                  <a href={item.url || `https://yaarisports.pages.dev/live/live?id=will`}>
                                     <div className="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiCard-root mui-style-3m0n0e-card">
                                       <button
                                         className="MuiButtonBase-root MuiCardActionArea-root mui-style-wytmrr-cardActionArea"
