@@ -1534,18 +1534,6 @@ padding-right: 4px;
   cursor: pointer;
   /* margin-right: 16px; */
 }
-
-.mui-style-bpw69w-flex-items_center {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-}
-
 .mui-style-12v59qj-mb_x {
   margin: 0;
   font-family: JioType Var;
@@ -2834,6 +2822,7 @@ ul.footer-cat-links.active {
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+  margin-top: 18px;
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
