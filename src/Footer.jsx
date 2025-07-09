@@ -56,10 +56,10 @@ function Footer() {
               </span>
               <div className="mui-style-14gto0e-flex-items_center-mb_2x-iconsContainer">
                 {[
-                  { name: 'Facebook', url: 'https://www.jiocinema.com/images/facebook.svg' },
-                  { name: 'Twitter', url: 'https://www.jiocinema.com/images/twitter.svg' },
-                  { name: 'Instagram', url: 'https://www.jiocinema.com/images/instagram.svg' },
-                  { name: 'YouTube', url: 'https://www.jiocinema.com/images/youtube.svg' },
+                  { name: 'F', url: 'https://yaarisportslive.pages.dev/images/facebook.svg' },
+                  { name: 'T', url: 'https://yaarisportslive.pages.dev/images/twitter.svg' },
+                  { name: 'I', url: 'https://yaarisportslive.pages.dev/images/instagram.svg' },
+                  { name: 'Y', url: 'https://yaarisportslive.pages.dev/images/youtube.svg' },
                 ].map((social, index) => (
                   <a href="#" key={index} className="mui-style-17kt6dh-socialIconSpace">
                     <div className="mui-style-1en7gzj-iconBackground">
@@ -85,14 +85,14 @@ function Footer() {
               <a className="mui-style-xnwyuu-mr_x" href="#" target="_blank" rel="noreferrer">
                 <img
                   alt="Google Play"
-                  src="https://www.jiocinema.com/images/googlePlay.svg"
+                  src="https://myjiostatic.cdn.jio.com/jio/svg/android-ios-logo/G-Play.svg"
                   loading="lazy"
                 />
               </a>
               <a className="mui-style-xnwyuu-mr_x" href="#" target="_blank" rel="noreferrer">
                 <img
                   alt="Apple Store"
-                  src="https://www.jiocinema.com/images/appleStore.svg"
+                  src="https://myjiostatic.cdn.jio.com/jio/svg/android-ios-logo/AppStore.svg"
                   loading="lazy"
                 />
               </a>
