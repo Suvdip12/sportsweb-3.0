@@ -158,26 +158,29 @@ const VideoPlayer = () => {
 
   // Handle user choice
   const handleChoice = async (isMobile) => {
-    const stream = await fetchStream();
-    if (!stream) return;
+  const stream = await fetchStream();
+  if (!stream) return;
 
-    if (isMobile) {
-      let finalUrl = stream.url.includes(".m3u8")
-        ? stream.url.split("|")[0]
-        : stream.url;
+  if (isMobile) {
+    let finalUrl = stream.url.includes(".m3u8")
+      ? stream.url.split("|")[0]
+      : stream.url;
 
-      let drmPart = "";
-      if (stream.keyId && stream.key) {
-        drmPart = `|drmScheme=clearkey&drmLicense=${stream.keyId}:${stream.key}`;
-      }
-
-      const intentUrl = `intent:${finalUrl}${drmPart}#Intent;package=com.genuine.leone;end`;
-      window.location.href = intentUrl;
-    } else {
-      setShowDialog(false);
-      setIsDesktop(true);
+    let drmPart = "";
+    if (stream.keyId && stream.key) {
+      drmPart = `|drmScheme=clearkey&drmLicense=${stream.keyId}:${stream.key}`;
     }
-  };
+
+    // Correct Intent URL format
+    const intentUrl = `Intent://${finalUrl}${drmPart}#Intent;scheme=https;package=com.genuine.leone;end`;
+
+    console.log("Redirecting to:", intentUrl);
+    window.location.href = intentUrl;
+  } else {
+    setShowDialog(false);
+    setIsDesktop(true);
+  }
+};
 
   return (
     <>
