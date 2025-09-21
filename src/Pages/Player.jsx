@@ -6,13 +6,88 @@ const VideoPlayer = () => {
   const videoRef = useRef(null);
   const containerRef = useRef(null);
   const playerRef = useRef(null);
-  const [showDialog, setShowDialog] = useState(true); // show dialog on start
+  const [showDialog, setShowDialog] = useState(true);
+  const [streamData, setStreamData] = useState(null);
+  const [isDesktop, setIsDesktop] = useState(false);
 
+  // Fetch stream only after user decides
+  const fetchStream = async () => {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const id = urlParams.get("id");
+
+      if (!id) {
+        console.error("No ID provided in URL");
+        return null;
+      }
+
+      let stream = null;
+
+      // Try GitHub JSON first
+      try {
+        const ghRes = await fetch(
+          "https://raw.githubusercontent.com/drmlive/fancode-live-events/main/fancode.json"
+        );
+        if (ghRes.ok) {
+          const ghData = await ghRes.json();
+          for (const key in ghData) {
+            if (
+              ghData[key].name &&
+              ghData[key].name.toLowerCase() === id.toLowerCase()
+            ) {
+              stream = {
+                url: ghData[key].url,
+                keyId: ghData[key].keyId,
+                key: ghData[key].key,
+              };
+              break;
+            }
+          }
+        }
+      } catch (e) {
+        console.warn("GitHub fetch failed, fallback to Firebase");
+      }
+
+      // If not found in GitHub → fallback Firebase
+      if (!stream) {
+        const fbRes = await fetch(
+          "https://try-firebase-6d461-default-rtdb.firebaseio.com/keys.json"
+        );
+        if (fbRes.ok) {
+          const fbData = await fbRes.json();
+          for (const key in fbData) {
+            if (
+              fbData[key].name &&
+              fbData[key].name.toLowerCase() === id.toLowerCase()
+            ) {
+              stream = {
+                url: fbData[key].url,
+                keyId: fbData[key].keyId,
+                key: fbData[key].key,
+              };
+              break;
+            }
+          }
+        }
+      }
+
+      if (!stream) {
+        throw new Error("Stream not found for ID: " + id);
+      }
+
+      setStreamData(stream);
+      return stream;
+    } catch (error) {
+      console.error("Error fetching stream:", error);
+      return null;
+    }
+  };
+
+  // Play stream with Shaka (desktop only)
   useEffect(() => {
-    if (showDialog) return; // wait until user answers dialog
+    if (!isDesktop || !streamData) return;
 
     shaka.polyfill.installAll();
-
     if (!shaka.Player.isBrowserSupported()) {
       console.error("Browser not supported!");
       return;
@@ -20,12 +95,9 @@ const VideoPlayer = () => {
 
     const video = videoRef.current;
     const container = containerRef.current;
-
-    // Create player
     const player = new shaka.Player(video);
     playerRef.current = player;
 
-    // Create Shaka UI overlay
     const ui = new shaka.ui.Overlay(player, container, video);
 
     const uiConfig = {
@@ -50,63 +122,25 @@ const VideoPlayer = () => {
       singleClickForPlayAndPause: true,
       doubleClickForFullscreen: true,
     };
-
     ui.configure(uiConfig);
 
-    const fetchAndLoadStream = async () => {
+    const loadStream = async () => {
       try {
-        const urlParams = new URLSearchParams(window.location.search);
-        const id = urlParams.get("id");
-
-        if (!id) {
-          console.error("No ID provided in URL");
-          return;
-        }
-
-        const response = await fetch(
-          "https://try-firebase-6d461-default-rtdb.firebaseio.com/keys.json"
-        );
-        if (!response.ok) throw new Error("Network response was not ok");
-        const data = await response.json();
-
-        let stream = null;
-        for (const key in data) {
-          if (
-            data[key].name &&
-            data[key].name.toLowerCase() === id.toLowerCase()
-          ) {
-            stream = {
-              url: data[key].url,
-              keyId: data[key].keyId,
-              key: data[key].key,
-            };
-            break;
-          }
-        }
-
-        if (!stream) throw new Error("Stream not found for ID: " + id);
-
         const playerConfig = {
-          streaming: {
-            lowLatencyMode: true,
-            bufferingGoal: 3,
-          },
+          streaming: { lowLatencyMode: true, bufferingGoal: 3 },
         };
 
-        // Check if DRM
-        if (stream.keyId && stream.key) {
+        if (streamData.keyId && streamData.key) {
           playerConfig.drm = {
-            clearKeys: { [stream.keyId]: stream.key },
+            clearKeys: { [streamData.keyId]: streamData.key },
           };
         }
 
         player.configure(playerConfig);
 
-        // Handle m3u8 or mpd
-        let finalUrl = stream.url;
-        if (finalUrl.includes(".m3u8")) {
-          finalUrl = finalUrl.split("|")[0]; // ensure clean m3u8 URL
-        }
+        let finalUrl = streamData.url.includes(".m3u8")
+          ? streamData.url.split("|")[0]
+          : streamData.url;
 
         await player.load(finalUrl);
         console.log("Stream loaded:", finalUrl);
@@ -115,23 +149,33 @@ const VideoPlayer = () => {
       }
     };
 
-    fetchAndLoadStream();
+    loadStream();
 
     return () => {
-      if (playerRef.current) {
-        playerRef.current.destroy();
-      }
+      if (playerRef.current) playerRef.current.destroy();
     };
-  }, [showDialog]);
+  }, [isDesktop, streamData]);
 
   // Handle user choice
-  const handleChoice = (isMobile) => {
+  const handleChoice = async (isMobile) => {
+    const stream = await fetchStream();
+    if (!stream) return;
+
     if (isMobile) {
-      // Redirect with intent
-      window.location.href =
-        "Intent:https://live-cito.9c9media.ca/1c3b314400c213d678f83ef6687899a3dfb7c8b21674096484889/f/tsn1/manifest.mpd?|drmScheme=clearkey&drmLicense=8df41512092240d38550e83dc05e157e:f29f106ec9f58b41c7c8391b64f3bb25#Intent;package=com.genuine.leone;end";
+      let finalUrl = stream.url.includes(".m3u8")
+        ? stream.url.split("|")[0]
+        : stream.url;
+
+      let drmPart = "";
+      if (stream.keyId && stream.key) {
+        drmPart = `|drmScheme=clearkey&drmLicense=${stream.keyId}:${stream.key}`;
+      }
+
+      const intentUrl = `intent:${finalUrl}${drmPart}#Intent;package=com.genuine.leone;end`;
+      window.location.href = intentUrl;
     } else {
-      setShowDialog(false); // continue with Shaka
+      setShowDialog(false);
+      setIsDesktop(true);
     }
   };
 
@@ -154,9 +198,7 @@ const VideoPlayer = () => {
             zIndex: 9999,
           }}
         >
-          <h2 style={{ marginBottom: "20px" }}>
-            📱 Are you using a Mobile Device?
-          </h2>
+          <h2 style={{ marginBottom: "20px" }}>Are you using a Mobile Device?</h2>
           <div>
             <button
               onClick={() => handleChoice(true)}
