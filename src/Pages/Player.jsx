@@ -172,7 +172,7 @@ const VideoPlayer = () => {
     }
 
     // Correct Intent URL format
-    const intentUrl = `Intent://${finalUrl}${drmPart}#Intent;scheme=https;package=com.genuine.leone;end`;
+    const intentUrl = `intent:${finalUrl}${drmPart}#intent;package=com.genuine.leone;end`;
 
     console.log("Redirecting to:", intentUrl);
     window.location.href = intentUrl;
@@ -201,7 +201,7 @@ const VideoPlayer = () => {
             zIndex: 9999,
           }}
         >
-          <h2 style={{ marginBottom: "20px" }}>Are you using a Mobile Device?</h2>
+          <h2 style={{ marginBottom: "20px" }}>Are you using a Mobile Device?:</h2>
           <div>
             <button
               onClick={() => handleChoice(true)}
