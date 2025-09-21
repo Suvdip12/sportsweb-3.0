@@ -1,22 +1,20 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Splide, SplideSlide } from '@splidejs/react-splide';
-import '@splidejs/react-splide/css';
+import React, { useEffect, useRef, useState } from "react";
+import { Splide, SplideSlide } from "@splidejs/react-splide";
+import "@splidejs/react-splide/css";
 
 const Carousel = () => {
   const splideRef = useRef(null);
-  const [items, setItems] = useState([]);
+  const [matches, setMatches] = useState([]);
 
   // Fetch slide data from API
   useEffect(() => {
     const fetchSlides = async () => {
       try {
-        const res = await fetch(
-          'https://api.slingacademy.com/v1/sample-data/photos?offset=5&limit=20',
-        );
+        const res = await fetch("https://raw.githubusercontent.com/drmlive/fancode-live-events/main/fancode.json");
         const data = await res.json();
-        setItems(data.result || []);
+        setMatches(data.matches || []);
       } catch (err) {
-        console.error('Failed to load slides:', err);
+        console.error("Failed to load matches:", err);
       }
     };
 
@@ -25,18 +23,18 @@ const Carousel = () => {
 
   // Re-mount Splide after items are loaded
   useEffect(() => {
-    if (splideRef.current && items.length > 0) {
-      splideRef.current.splide?.destroy(); // optional cleanup
+    if (splideRef.current && matches.length > 0) {
+      splideRef.current.splide?.destroy();
       splideRef.current.splide?.mount();
     }
-  }, [items]);
+  }, [matches]);
 
   const goPrev = () => {
-    splideRef.current?.splide?.go('<');
+    splideRef.current?.splide?.go("<");
   };
 
   const goNext = () => {
-    splideRef.current?.splide?.go('>');
+    splideRef.current?.splide?.go(">");
   };
 
   return (
@@ -45,12 +43,16 @@ const Carousel = () => {
         <div className="infinite-scroll-component__outerdiv">
           <div
             className="infinite-scroll-component"
-            style={{ height: 'auto', overflow: 'unset', WebkitOverflowScrolling: 'touch' }}
+            style={{
+              height: "auto",
+              overflow: "unset",
+              WebkitOverflowScrolling: "touch",
+            }}
           >
             <div className="MuiGrid-root mui-style-ymleya">
               <div className="MuiGrid-root MuiGrid-item mui-style-6iih4l">
-                {items.length === 0 ? (
-                  <div className="loading"></div>
+                {matches.length === 0 ? (
+                  <div className="loading">Loading...</div>
                 ) : (
                   <Splide
                     options={{
@@ -59,113 +61,95 @@ const Carousel = () => {
                       pauseOnHover: false,
                       arrows: false,
                       perPage: 1,
-                      type: 'loop',
+                      type: "loop",
                       pagination: true,
                       keyboard: false,
                       slideFocus: false,
                     }}
-                    onMove={() => {
-                      const slides = document.querySelectorAll('.splide__slide');
-                      slides.forEach((slide) => {
-                        slide.classList.add('is-visible');
-                      });
-                    }}
                     ref={splideRef}
                     className="splide"
                   >
-                    {items.map((item, index) => (
+                    {matches.map((match, index) => (
                       <SplideSlide
-                        key={index}
+                        key={match.match_id}
                         className="splide__slide"
                         role="group"
-                        aria-label={`slide ${index + 1} of ${items.length}`}
+                        aria-label={`slide ${index + 1} of ${matches.length}`}
                       >
-                        <div className="slick-track" style={{ width: '1000%', left: '0%' }}>
-                          <div
-                            data-index={index}
-                            className="slick-slide slick-active slick-current"
-                            tabIndex={-1}
-                            aria-hidden="false"
-                            style={{ outline: 'none', width: '10%' }}
-                          >
-                            <div className="mui-style-tm6sms-cntr">
-                              <div className="mui-style-815i2y-root">
-                                <div className="MuiStack-root mui-style-1ov46kg">
-                                  <div className="MuiStack-root mui-style-18zsr3k">
-                                    <a
-                                      className="mui-style-o66pnj"
-                                      href={item.url || `https://yaarisports.pages.dev/live/live?id=will`}
-                                      id={`shortTitle${index + 1}`}
+                        <div className="mui-style-tm6sms-cntr">
+                          <div className="mui-style-815i2y-root">
+                            <div className="MuiStack-root mui-style-1ov46kg">
+                              <div className="MuiStack-root mui-style-18zsr3k">
+                                <a
+                                  className="mui-style-o66pnj"
+                                  href={`./player?id=${match.match_id}`}
+                                  id={`shortTitle${index + 1}`}
+                                >
+                                  {match.title}
+                                </a>
+                                <p className="mui-style-1xn847g-line2">
+                                  {match.event_category} • {match.event_name} •{" "}
+                                  {match.status}
+                                </p>
+                              </div>
+                              <div className="mui-style-pmv5z6-root">
+                                <a
+                                  id={`buttonAnchor${index + 1}`}
+                                  href={`./player?id=${match.match_id}`}
+                                >
+                                  <button
+                                    className="mui-style-haa95m-watchNowBtn"
+                                    tabIndex={0}
+                                    type="button"
+                                  >
+                                    <svg
+                                      width="18"
+                                      height="16"
+                                      viewBox="0 0 15 18"
+                                      xmlns="http://www.w3.org/2000/svg"
                                     >
-                                      {item.shortTitle || 'Untitled'}
-                                    </a>
-                                    <p className="mui-style-1xn847g-line2">
-                                      {item.language || 'Eng'} • Sports • U/A 16+
+                                      <path
+                                        d="M2.43693 16.9865C1.77124 17.4108 0.899414 16.9326 0.899414 16.1432V1.85653C0.899414 1.0671 1.77124 0.588944 2.43694 1.01328L13.6432 8.15662C14.2599 8.54969 14.2598 9.45005 13.6432 9.84312L2.43693 16.9865Z"
+                                        fill="#FFFFFF"
+                                      />
+                                    </svg>
+                                    <p
+                                      className="MuiTypography-root MuiTypography-body1Bold mui-style-6z4y8n"
+                                      style={{ cursor: "pointer" }}
+                                    >
+                                      {match.status === "LIVE" ? "Watch Live" : "Details"}
                                     </p>
-                                  </div>
-                                  <div className="mui-style-pmv5z6-root">
-                                    <a
-                                      id={`buttonAnchor${index + 1}`}
-                                      href={item.url || `https://yaarisports.pages.dev/live/live?id=will`}
-                                    >
-                                      <button
-                                        className="mui-style-haa95m-watchNowBtn"
-                                        tabIndex={0}
-                                        type="button"
-                                      >
-                                        <svg
-                                          width="18"
-                                          height="16"
-                                          viewBox="0 0 15 18"
-                                          xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                          <path
-                                            d="M2.43693 16.9865C1.77124 17.4108 0.899414 16.9326 0.899414 16.1432V1.85653C0.899414 1.0671 1.77124 0.588944 2.43694 1.01328L13.6432 8.15662C14.2599 8.54969 14.2598 9.45005 13.6432 9.84312L2.43693 16.9865Z"
-                                            fill="#FFFFFF"
-                                          />
-                                        </svg>
-                                        <p
-                                          className="MuiTypography-root MuiTypography-body1Bold mui-style-6z4y8n"
-                                          style={{ cursor: 'pointer' }}
-                                        >
-                                          Watch
-                                        </p>
-                                      </button>
-                                    </a>
-                                  </div>
-                                </div>
+                                  </button>
+                                </a>
                               </div>
-                              <div className="MuiGrid-root MuiGrid-container mui-style-1d3bbye">
-                                <div className="mui-style-efh377-metaBkg">
-                                  <div className="mui-style-19gfk8p-gradient"></div>
+                            </div>
+                          </div>
+                          <div className="MuiGrid-root MuiGrid-container mui-style-1d3bbye">
+                            <div className="mui-style-efh377-metaBkg">
+                              <div className="mui-style-19gfk8p-gradient"></div>
+                            </div>
+                            <div className="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-1 MuiGrid-grid-md-1.5 MuiGrid-grid-lg-1.2 mui-style-13eysxj">
+                              <a href={`./player?id=${match.match_id}`}>
+                                <div className="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiCard-root mui-style-3m0n0e-card">
+                                  <button
+                                    className="MuiButtonBase-root MuiCardActionArea-root mui-style-wytmrr-cardActionArea"
+                                    tabIndex={0}
+                                    type="button"
+                                  >
+                                    <picture className="mui-style-1qswh78-fullOpacity">
+                                      <source type="image/webp" srcSet={match.src} />
+                                      <img
+                                        className="mui-style-13exe5a-image-full"
+                                        id={`ogImage${index + 1}`}
+                                        src={match.src}
+                                        alt={match.title}
+                                      />
+                                    </picture>
+                                    <div className="mui-style-m8qrcw-overlay"></div>
+                                    <span className="MuiCardActionArea-focusHighlight mui-style-jo3ec3"></span>
+                                  </button>
                                 </div>
-                                <div className="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-1 MuiGrid-grid-md-1.5 MuiGrid-grid-lg-1.2 mui-style-13eysxj">
-                                  <a href={item.url || `https://yaarisports.pages.dev/live/live?id=will`}>
-                                    <div className="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiCard-root mui-style-3m0n0e-card">
-                                      <button
-                                        className="MuiButtonBase-root MuiCardActionArea-root mui-style-wytmrr-cardActionArea"
-                                        tabIndex={0}
-                                        type="button"
-                                      >
-                                        <picture className="mui-style-1qswh78-fullOpacity">
-                                          <source
-                                            type="image/webp"
-                                            srcSet={item.photos?.url || '#'}
-                                          />
-                                          <img
-                                            className="mui-style-13exe5a-image-full"
-                                            id={`ogImage${index + 1}`}
-                                            src={item.photos?.url || '#'}
-                                            alt={item.shortTitle || 'Slide Image'}
-                                          />
-                                        </picture>
-                                        <div className="mui-style-m8qrcw-overlay"></div>
-                                        <span className="MuiCardActionArea-focusHighlight mui-style-jo3ec3"></span>
-                                      </button>
-                                    </div>
-                                  </a>
-                                </div>
-                              </div>
+                              </a>
                             </div>
                           </div>
                         </div>
@@ -178,6 +162,8 @@ const Carousel = () => {
           </div>
         </div>
       </div>
+
+      {/* Manual Prev/Next Buttons */}
       <div className="sbutton">
         <button className="previous-button is-control" onClick={goPrev}>
           <span className="fas fa-angle-left" aria-hidden="true"></span>
