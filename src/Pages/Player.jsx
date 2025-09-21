@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import shaka from "shaka-player/dist/shaka-player.ui.js"; // Shaka core + UI
 import "shaka-player/dist/controls.css";
 
@@ -6,8 +6,11 @@ const VideoPlayer = () => {
   const videoRef = useRef(null);
   const containerRef = useRef(null);
   const playerRef = useRef(null);
+  const [showDialog, setShowDialog] = useState(true); // show dialog on start
 
   useEffect(() => {
+    if (showDialog) return; // wait until user answers dialog
+
     shaka.polyfill.installAll();
 
     if (!shaka.Player.isBrowserSupported()) {
@@ -25,7 +28,6 @@ const VideoPlayer = () => {
     // Create Shaka UI overlay
     const ui = new shaka.ui.Overlay(player, container, video);
 
-    // Configure Shaka UI
     const uiConfig = {
       controlPanelElements: [
         "rewind",
@@ -40,7 +42,6 @@ const VideoPlayer = () => {
         "quality",
         "playback_rate",
         "picture_in_picture",
-        "cast",
         "fullscreen",
       ],
       addSeekBar: true,
@@ -48,15 +49,6 @@ const VideoPlayer = () => {
       enableKeyboardPlaybackControls: true,
       singleClickForPlayAndPause: true,
       doubleClickForFullscreen: true,
-      seekBarColors: {
-        base: "rgba(255, 255, 255, 0.3)",
-        buffered: "rgba(255, 255, 255, 0.54)",
-        played: "#02a5f6",
-      },
-      volumeBarColors: {
-        base: "rgba(255, 255, 255, 0.3)",
-        level: "#02a5f6",
-      },
     };
 
     ui.configure(uiConfig);
@@ -92,11 +84,8 @@ const VideoPlayer = () => {
           }
         }
 
-        if (!stream) {
-          throw new Error("Stream not found for ID: " + id);
-        }
+        if (!stream) throw new Error("Stream not found for ID: " + id);
 
-        // Configure player
         const playerConfig = {
           streaming: {
             lowLatencyMode: true,
@@ -104,6 +93,7 @@ const VideoPlayer = () => {
           },
         };
 
+        // Check if DRM
         if (stream.keyId && stream.key) {
           playerConfig.drm = {
             clearKeys: { [stream.keyId]: stream.key },
@@ -112,8 +102,14 @@ const VideoPlayer = () => {
 
         player.configure(playerConfig);
 
-        await player.load(stream.url);
-        console.log("Stream loaded successfully");
+        // Handle m3u8 or mpd
+        let finalUrl = stream.url;
+        if (finalUrl.includes(".m3u8")) {
+          finalUrl = finalUrl.split("|")[0]; // ensure clean m3u8 URL
+        }
+
+        await player.load(finalUrl);
+        console.log("Stream loaded:", finalUrl);
       } catch (error) {
         console.error("Error loading stream:", error);
       }
@@ -126,26 +122,92 @@ const VideoPlayer = () => {
         playerRef.current.destroy();
       }
     };
-  }, []);
+  }, [showDialog]);
+
+  // Handle user choice
+  const handleChoice = (isMobile) => {
+    if (isMobile) {
+      // Redirect with intent
+      window.location.href =
+        "Intent:https://live-cito.9c9media.ca/1c3b314400c213d678f83ef6687899a3dfb7c8b21674096484889/f/tsn1/manifest.mpd?|drmScheme=clearkey&drmLicense=8df41512092240d38550e83dc05e157e:f29f106ec9f58b41c7c8391b64f3bb25#Intent;package=com.genuine.leone;end";
+    } else {
+      setShowDialog(false); // continue with Shaka
+    }
+  };
 
   return (
-    <div
-      className="video-container"
-      ref={containerRef}
-      style={{
-        width: "100%",
-        height: "100vh", // full height
-        backgroundColor: "black",
-      }}
-    >
-      <video
-        id="video"
-        ref={videoRef}
-        autoPlay
-        playsInline
-        style={{ width: "100%", height: "100%" }}
-      />
-    </div>
+    <>
+      {showDialog ? (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            background: "rgba(0,0,0,0.85)",
+            color: "#fff",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 9999,
+          }}
+        >
+          <h2 style={{ marginBottom: "20px" }}>
+            📱 Are you using a Mobile Device?
+          </h2>
+          <div>
+            <button
+              onClick={() => handleChoice(true)}
+              style={{
+                padding: "10px 20px",
+                margin: "10px",
+                background: "#02a5f6",
+                border: "none",
+                borderRadius: "8px",
+                color: "#fff",
+                cursor: "pointer",
+              }}
+            >
+              Yes
+            </button>
+            <button
+              onClick={() => handleChoice(false)}
+              style={{
+                padding: "10px 20px",
+                margin: "10px",
+                background: "#555",
+                border: "none",
+                borderRadius: "8px",
+                color: "#fff",
+                cursor: "pointer",
+              }}
+            >
+              No
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div
+          className="video-container"
+          ref={containerRef}
+          style={{
+            width: "100%",
+            height: "100vh",
+            backgroundColor: "black",
+          }}
+        >
+          <video
+            id="video"
+            ref={videoRef}
+            autoPlay
+            playsInline
+            style={{ width: "100%", height: "100%" }}
+          />
+        </div>
+      )}
+    </>
   );
 };
 

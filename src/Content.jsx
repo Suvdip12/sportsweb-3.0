@@ -6,31 +6,31 @@ function Content() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch('https://content-jiovoot.voot.com/psapi/voot/v1/voot-web/content/specific/editorial-clone?query=include%3A138e719e9fe75a4f4dee0dc7f0f7112d&source=CMS&discounting=false&aspectRatio=16x9&responseType=common')
+    fetch('https://raw.githubusercontent.com/drmlive/fancode-live-events/main/fancode.json')
       .then(response => response.json())
       .then(data => {
-        const seoDataArray = data.result;
-        if (!seoDataArray || seoDataArray.length === 0) {
-          setError('No content found.');
+        const matchesArray = data.matches;
+        if (!matchesArray || matchesArray.length === 0) {
+          setError('No matches found.');
           return;
         }
 
-        const html = seoDataArray.map(seoData => {
-          const { title, description, ogImage: imageUrl, urlStructureNew: watchUrl } = seoData.seo;
+        const html = matchesArray.map(match => {
+          const { title, src: imageUrl, team_1, team_2, status, event_name, startTime } = match;
 
           return (
             `<article class="ripple sports-card normal tray-slide">
-              <a href="/in/">
+              <a href="/match/${match.match_id}">
                 <div class="thumbnail-container">
                   <div class="card card-img-container">
-                    <img src="${imageUrl}" class="img-loader lazy-img-loader loaded" loading="lazy" alt="">
+                    <img src="${imageUrl}" class="img-loader lazy-img-loader loaded" loading="lazy" alt="${title}">
                   </div>
                 </div>
                 <div class="meta-desc">
                   <div class="play-icon"></div>
                   <div class="meta-wrapper">
                     <div class="title ellipsize">
-                      <span class="content-title">${description}</span>
+                      <span class="content-title">${title}</span>
                     </div>
                   </div>
                 </div>
@@ -42,8 +42,8 @@ function Content() {
         setContentHtml(html);
       })
       .catch(err => {
-        console.error('Error fetching SEO data:', err);
-        setError('Error fetching content. Please try again later.');
+        console.error('Error fetching Fancode data:', err);
+        setError('Error fetching matches. Please try again later.');
       });
   }, []);
 
@@ -65,11 +65,11 @@ function Content() {
                             <div className="row">
                               <div className="col-md-12">
                                 <div className="vfx-item-section">
-                                  <a href="/collections/best-in-sports/3" title="Best in Sports">
-                                    <h3>Best in Sports</h3>
+                                  <a href="/collections/fancode" title="Fancode Live Matches">
+                                    <h3>Fancode Live Matches</h3>
                                   </a>
                                   <span className="view-more">
-                                    <a href="/collections/best-in-sports/3" title="view-more">View All</a>
+                                    <a href="/collections/fancode" title="view-more">View All</a>
                                   </span>
                                 </div>
                               </div>
