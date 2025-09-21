@@ -14,8 +14,7 @@ const App = () => {
   // Dynamically load Shaka Player scripts and CSS
   useEffect(() => {
     if (!isDesktop) return;
-    
-    // Check if scripts are already loaded
+
     if (window.shaka && window.shaka.Player) {
       console.log("Shaka Player already loaded.");
       return;
@@ -23,13 +22,15 @@ const App = () => {
 
     const loadScripts = () => {
       const shakaCoreScript = document.createElement("script");
-      shakaCoreScript.src = "https://cdn.jsdelivr.net/npm/shaka-player@4.16.2/dist/shaka-player.ui.js";
+      shakaCoreScript.src =
+        "https://cdn.jsdelivr.net/npm/shaka-player@4.16.2/dist/shaka-player.ui.js";
       shakaCoreScript.onload = initPlayer;
       document.head.appendChild(shakaCoreScript);
 
       const shakaCssLink = document.createElement("link");
       shakaCssLink.rel = "stylesheet";
-      shakaCssLink.href = "https://cdn.jsdelivr.net/npm/shaka-player@4.16.2/dist/controls.css";
+      shakaCssLink.href =
+        "https://cdn.jsdelivr.net/npm/shaka-player@4.16.2/dist/controls.css";
       document.head.appendChild(shakaCssLink);
     };
 
@@ -70,7 +71,7 @@ const App = () => {
         doubleClickForFullscreen: true,
       };
       ui.configure(uiConfig);
-      
+
       if (streamData) {
         loadStream();
       }
@@ -196,21 +197,29 @@ const App = () => {
       setError("Stream not found. Please check the URL ID.");
       return;
     }
+
     if (isMobile) {
       let finalUrl = stream.url.includes(".m3u8")
         ? stream.url.split("|")[0]
         : stream.url;
 
-      const intentUrl =
-        `intent:${finalUrl}#Intent;` +
-        `package=com.genuine.leone;` +
-        `S.url=${encodeURIComponent(finalUrl)};` +
-        `S.keyId=${encodeURIComponent(stream.keyId)};` +
-        `S.key=${encodeURIComponent(stream.key)};` +
-        `end`;
+      if (stream.keyId && stream.key) {
+        finalUrl += `|drmScheme=clearkey&drmLicense=${stream.keyId}:${stream.key}`;
+      }
+
+      // Correct Android Intent URL
+      const intentUrl = `intent://${finalUrl}#Intent;scheme=https;package=com.genuine.leone;end`;
 
       console.log("Redirecting to:", intentUrl);
       window.location.href = intentUrl;
+
+      // Fallback → after 1.5s, if NS Player not installed, load Shaka
+      setTimeout(() => {
+        if (!document.hidden) {
+          console.warn("NS Player not installed, fallback to web player");
+          setIsDesktop(true);
+        }
+      }, 1500);
     } else {
       setIsDesktop(true);
     }
@@ -278,7 +287,7 @@ const App = () => {
             autoPlay
             playsInline
             className="w-full h-full object-contain"
-            style={{ visibility: loading || error ? 'hidden' : 'visible' }}
+            style={{ visibility: loading || error ? "hidden" : "visible" }}
           />
         </div>
       )}
