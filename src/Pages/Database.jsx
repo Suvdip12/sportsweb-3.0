@@ -95,7 +95,8 @@ const styles = {
     fontFamily: 'Arial, sans-serif',
     backgroundColor: '#f0f2f5',
     textAlign: 'center',
-    padding: '20px'
+    padding: '20px',
+    color: '#000000ff'
   },
   input: {
     width: '80%',
@@ -118,6 +119,7 @@ const styles = {
     padding: '10px',
     borderRadius: '5px',
     margin: '10px auto',
-    width: '80%'
+    width: '80%',
+    overflowWrap: 'break-word',
   }
 };
