@@ -16,11 +16,11 @@ function Content() {
         }
 
         const html = matchesArray.map(match => {
-          const { title, src: imageUrl, team_1, team_2, status, event_name, startTime } = match;
+          const { title, src: imageUrl} = match;
 
           return (
             `<article class="ripple sports-card normal tray-slide">
-              <a href="/match/${match.match_id}">
+              <a href="/watch?id=${match.match_id}">
                 <div class="thumbnail-container">
                   <div class="card card-img-container">
                     <img src="${imageUrl}" class="img-loader lazy-img-loader loaded" loading="lazy" alt="${title}">

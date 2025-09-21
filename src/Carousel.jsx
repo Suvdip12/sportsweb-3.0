@@ -96,7 +96,7 @@ const Carousel = () => {
                               <div className="mui-style-pmv5z6-root">
                                 <a
                                   id={`buttonAnchor${index + 1}`}
-                                  href={`./player?id=${match.match_id}`}
+                                  href={`./watch?id=${match.match_id}`}
                                 >
                                   <button
                                     className="mui-style-haa95m-watchNowBtn"
@@ -130,7 +130,7 @@ const Carousel = () => {
                               <div className="mui-style-19gfk8p-gradient"></div>
                             </div>
                             <div className="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-1 MuiGrid-grid-md-1.5 MuiGrid-grid-lg-1.2 mui-style-13eysxj">
-                              <a href={`./player?id=${match.match_id}`}>
+                              <a href={`./watch?id=${match.match_id}`}>
                                 <div className="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiCard-root mui-style-3m0n0e-card">
                                   <button
                                     className="MuiButtonBase-root MuiCardActionArea-root mui-style-wytmrr-cardActionArea"
