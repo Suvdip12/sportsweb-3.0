@@ -11,9 +11,11 @@
   },
   "dependencies": {
     "@splidejs/react-splide": "^0.7.12",
+    "firebase": "^12.3.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-router-dom": "^7.6.0"
+    "react-router-dom": "^7.6.0",
+    "shaka-player": "^4.16.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",

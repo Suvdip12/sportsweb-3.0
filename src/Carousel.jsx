@@ -11,7 +11,7 @@ const Carousel = () => {
     const fetchSlides = async () => {
       try {
         const res = await fetch(
-          'https://content-jiovoot.voot.com/psapi/voot/v1/voot-web/content/specific/editorial?query=include%3Ace691406dd141723a79ea91ed4a49b34&source=PNR&discounting=true&aspectRatio=16x9&view=sports&layoutCohort=default&responseType=common'
+          'https://api.slingacademy.com/v1/sample-data/photos?offset=5&limit=20',
         );
         const data = await res.json();
         setItems(data.result || []);
@@ -150,12 +150,12 @@ const Carousel = () => {
                                         <picture className="mui-style-1qswh78-fullOpacity">
                                           <source
                                             type="image/webp"
-                                            srcSet={item.seo?.ogImage || '#'}
+                                            srcSet={item.photos?.url || '#'}
                                           />
                                           <img
                                             className="mui-style-13exe5a-image-full"
                                             id={`ogImage${index + 1}`}
-                                            src={item.seo?.ogImage || '#'}
+                                            src={item.photos?.url || '#'}
                                             alt={item.shortTitle || 'Slide Image'}
                                           />
                                         </picture>
