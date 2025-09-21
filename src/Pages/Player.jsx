@@ -167,7 +167,9 @@ const App = () => {
         finalUrl += `|drmScheme=clearkey&drmLicense=${stream.keyId}:${stream.key}`;
       }
 
-      const intentUrl = `intent://${finalUrl}#Intent;scheme=https;package=com.genuine.leone;end`;
+      const encodedUrl = encodeURIComponent(finalUrl);
+      const intentUrl = `intent://${encodedUrl}#Intent;scheme=https;package=com.genuine.leone;end`;
+
       window.location.href = intentUrl;
 
       setTimeout(() => {
