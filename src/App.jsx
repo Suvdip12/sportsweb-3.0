@@ -1,15 +1,14 @@
 import React from 'react';
-import Footer from './Footer.jsx'
-import Header from './Header.jsx'
-import Carousel from './Carousel.jsx'
-import Content from './Content.jsx'
+import { Outlet } from 'react-router-dom';
+import Footer from './Footer.jsx';
+import Header from './Header.jsx';
+
 function App() {
   return (
     <>
-     <Header />
-     <Carousel />
-    <Content />
-    <Footer />
+      <Header />
+      <Outlet />
+      <Footer />
     </>
   );
 }

@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from "react";
-import shaka from "shaka-player/dist/shaka-player.ui.js"; // Shaka core + UI
+import shaka from "shaka-player/dist/shaka-player.ui.js";
 import "shaka-player/dist/controls.css";
 
-const VideoPlayer = () => {
+const VideoPlayer = ({ seriesName, videoUrl }) => {
   const videoRef = useRef(null);
   const containerRef = useRef(null);
   const playerRef = useRef(null);
@@ -17,15 +17,10 @@ const VideoPlayer = () => {
 
     const video = videoRef.current;
     const container = containerRef.current;
-
-    // Create player
     const player = new shaka.Player(video);
     playerRef.current = player;
 
-    // Create Shaka UI overlay
     const ui = new shaka.ui.Overlay(player, container, video);
-
-    // Configure Shaka UI
     const uiConfig = {
       controlPanelElements: [
         "rewind",
@@ -58,75 +53,29 @@ const VideoPlayer = () => {
         level: "#02a5f6",
       },
     };
-
     ui.configure(uiConfig);
 
-    const fetchAndLoadStream = async () => {
+    const loadStream = async () => {
       try {
-        const urlParams = new URLSearchParams(window.location.search);
-        const id = urlParams.get("id");
-
-        if (!id) {
-          console.error("No ID provided in URL");
-          return;
+        if (videoUrl) {
+          await player.load(videoUrl);
+          console.log("Stream loaded successfully");
+        } else {
+          console.error("No videoUrl provided");
         }
-
-        const response = await fetch(
-          "https://try-firebase-6d461-default-rtdb.firebaseio.com/keys.json"
-        );
-        if (!response.ok) throw new Error("Network response was not ok");
-        const data = await response.json();
-
-        let stream = null;
-        for (const key in data) {
-          if (
-            data[key].name &&
-            data[key].name.toLowerCase() === id.toLowerCase()
-          ) {
-            stream = {
-              url: data[key].url,
-              keyId: data[key].keyId,
-              key: data[key].key,
-            };
-            break;
-          }
-        }
-
-        if (!stream) {
-          throw new Error("Stream not found for ID: " + id);
-        }
-
-        // Configure player
-        const playerConfig = {
-          streaming: {
-            lowLatencyMode: true,
-            bufferingGoal: 3,
-          },
-        };
-
-        if (stream.keyId && stream.key) {
-          playerConfig.drm = {
-            clearKeys: { [stream.keyId]: stream.key },
-          };
-        }
-
-        player.configure(playerConfig);
-
-        await player.load(stream.url);
-        console.log("Stream loaded successfully");
       } catch (error) {
         console.error("Error loading stream:", error);
       }
     };
 
-    fetchAndLoadStream();
+    loadStream();
 
     return () => {
       if (playerRef.current) {
         playerRef.current.destroy();
       }
     };
-  }, []);
+  }, [videoUrl]);
 
   return (
     <div
@@ -134,7 +83,7 @@ const VideoPlayer = () => {
       ref={containerRef}
       style={{
         width: "100%",
-        height: "100vh", // full height
+        height: "100vh",
         backgroundColor: "black",
       }}
     >
